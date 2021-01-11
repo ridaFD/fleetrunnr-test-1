@@ -31,7 +31,7 @@ class UserResource extends JsonResource
 //            'permissions' => $this->whenPivotLoaded('account_user', function () {
 //                return $this->pivot->permissions;
 //            })
-        'permissions' => $this->pivot->permissions
+        'permissions' => json_decode($this->pivot->permissions)
         ];
     }
 }
