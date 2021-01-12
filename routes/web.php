@@ -17,5 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/management/users/all', [UserController::class, 'index']);
+Route::get('/management/users/all', [UserController::class, 'index'])->name('users.index');
+Route::get('/management/users/search', [UserController::class, 'search'])->name('search');
 

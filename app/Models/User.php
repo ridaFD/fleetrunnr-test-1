@@ -41,6 +41,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    public function scopeVerified($query)
+    {
+        return $query->where('email_verified_at', '!=', null);
+    }
+
     public function accounts()
     {
         return $this->belongsToMany(Account::class, 'account_user', 'user_id', 'account_id');
