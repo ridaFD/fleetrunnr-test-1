@@ -1,7 +1,7 @@
 <x-layout>
-    <div class="w-full m-2 flex">
-        <div class="border border-red-500 mr-2">
-            <form action="{{ route('search') }}" method="get" class="flex items-center p-2">
+    <div class="container w-full m-2 flex">
+        <div class="border border-red-500 p-2">
+            <form action="{{ route('search') }}" method="get" class="flex items-center">
                 @csrf
 
                 <div class="mr-4">
@@ -29,10 +29,10 @@
                 </button>
             </form>
 
-            <div class="flex flex-col border border-red-500 p-2 text-sm">
+            <div class="flex justify-between sm:flex-wrap mt-4">
                 @if(!empty($results))
                     @foreach($results as $result)
-                        <ul class="border border-black  p-2 mb-2">
+                        <ul class="border border-black sm:mb-2">
                             <li>
                                 <span class="font-bold bg-yellow-500">id: </span>{{ $result['id'] }}
                             </li>
@@ -58,7 +58,7 @@
                                 <span class="font-bold bg-yellow-500">Verified: </span>{{ $result->email_verified_at }}
                             </li>
                             <li>
-                                <span class="font-bold bg-yellow-500">Permissions: </span>{{ $result->persmissions }}
+                                <span class="font-bold bg-yellow-500">Permissions: </span>{{ $result->pivot->permissions }}
                             </li>
                         </ul>
                     @endforeach
@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <div class="border border-red-500 w-2/5 p-2 text-sm">
+        <div class="border border-red-500 p-2 text-sm">
             @foreach($users as $user)
                 <ul class="border border-black  p-2 mb-2">
                     <li>
@@ -94,11 +94,11 @@
                         <span class="font-bold bg-yellow-500">Verified: </span>{{ $user->email_verified_at }}
                     </li>
                     <li>
-                        <span class="font-bold bg-yellow-500">Permissions: </span>{{ $user->persmissions }}
+                        <span class="font-bold bg-yellow-500">Permissions: </span>{{ $user->pivot->permissions }}
                     </li>
                 </ul>
             @endforeach
-            {{--            {{ $users->links() }}--}}
+                {{ $users->links() }}
         </div>
     </div>
 </x-layout>

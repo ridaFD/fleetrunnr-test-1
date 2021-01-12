@@ -20,7 +20,7 @@ class UserController extends Controller
 
     public function search()
     {
-        $users = Account::where('name', 'rida')->firstOrFail()->users;
+        $users = Account::where('name', 'rida')->firstOrFail()->users()->paginate(5);
         $my_users = Account::where('name', 'rida')->firstOrFail()->users();
         $term = request('term');
 
@@ -37,6 +37,8 @@ class UserController extends Controller
             return view('users.index')
                 ->with('results', UserResource::collection($my_users->active()->get()))
                 ->with('users', $users);
+//            return UserResource::collection($users);
+//            dd($users[0]->pivot->permissions);
         }
 
         /**
@@ -101,5 +103,10 @@ class UserController extends Controller
                 ->with('results', [])
                 ->with('users', $users);
         }
+    }
+
+    public function create()
+    {
+        return view('users.create');
     }
 }
