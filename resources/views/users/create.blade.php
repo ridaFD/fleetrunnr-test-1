@@ -86,6 +86,12 @@
                             class="w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg focus:outline-none hover:bg-gray-900 hover:shadow-none">
                         Create
                     </button>
+
+                    @if(session('message'))
+                        <div>
+                            {{ session('message') }}
+                        </div>
+                    @endif
                 </form>
             </div>
         </div>

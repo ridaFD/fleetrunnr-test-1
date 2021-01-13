@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\User\Notifications\UserConfirmationNotification;
 use App\User\Request\CreateUserRequest;
 use App\User\Resources\UserResource;
 use App\Models\User;
 use App\Models\Account;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -110,31 +112,43 @@ class UserController extends Controller
         $phoneNumberUtil = \libphonenumber\PhoneNumberUtil::getInstance();
         $regions = $phoneNumberUtil->getSupportedCallingCodes();
         $regionCodes = $phoneNumberUtil->getSupportedCallingCodes();
+
         return view('users.create', [
             'regions' => $regions,
             'regionCodes' => $regionCodes
         ]);
     }
 
-    public function store(CreateUserRequest $request)
+    /**
+    * Used Form request validation
+     * Used Validation rule for phone number
+     * store the data in users table with active column after validation is successful
+     * assign the user to the logged in account in the pivot table account_user with give him editor permission
+     *
+     */
+    public function store()
     {
-        $request->validated();
+//        $request->validated();
+//
+//        User::create([
+//            'first_name' => request('first_name'),
+//            'last_name' => request('last_name'),
+//            'avatar' => request('avatar')->store('avatars'),
+//            'phone' => request('region') . ' ' . request('phone'),
+//            'email' => request('email'),
+//            'password' => Hash::make(request()['password']),
+//            'is_active' => 1
+//        ]);
 
-        User::create([
-            'first_name' => request('first_name'),
-            'last_name' => request('last_name'),
-            'avatar' => request('avatar')->store('avatars'),
-            'phone' => request('region') . ' ' . request('phone'),
-            'email' => request('email'),
-            'password' => Hash::make(request()['password']),
-            'is_active' => 1
-        ]);
+//        $account = Account::find(1);
+//        $user = User::latest()->first();
+//        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
 
-        $account = Account::find(1);
-        $user = User::latest()->first();
-        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
+        Mail::to('rami@gmail.com')
+            ->send(new UserConfirmationNotification());
 
-
-        return redirect()->back();
+        return redirect()
+            ->back()
+            ->with('message', 'email send');
     }
 }
