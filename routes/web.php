@@ -20,4 +20,5 @@ Route::get('/', function () {
 Route::get('/management/users/all', [UserController::class, 'index'])->name('users.index');
 Route::get('/management/users/search', [UserController::class, 'search'])->name('search');
 Route::get('/management/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/management/users/store', [UserController::class, 'store'])->name('users.store');
 

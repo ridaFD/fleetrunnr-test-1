@@ -17,7 +17,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone',
+        'avatar',
+        'is_active',
         'email',
         'password',
     ];
@@ -53,6 +57,6 @@ class User extends Authenticatable
 
     public function accounts()
     {
-        return $this->belongsToMany(Account::class, 'account_user', 'user_id', 'account_id');
+        return $this->belongsToMany(Account::class);
     }
 }

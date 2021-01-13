@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\User\Request\CreateUserRequest;
 use App\User\Resources\UserResource;
 use App\Models\User;
 use App\Models\Account;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -107,6 +107,34 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $phoneNumberUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+        $regions = $phoneNumberUtil->getSupportedCallingCodes();
+        $regionCodes = $phoneNumberUtil->getSupportedCallingCodes();
+        return view('users.create', [
+            'regions' => $regions,
+            'regionCodes' => $regionCodes
+        ]);
+    }
+
+    public function store(CreateUserRequest $request)
+    {
+        $request->validated();
+
+        User::create([
+            'first_name' => request('first_name'),
+            'last_name' => request('last_name'),
+            'avatar' => request('avatar')->store('avatars'),
+            'phone' => request('region') . ' ' . request('phone'),
+            'email' => request('email'),
+            'password' => Hash::make(request()['password']),
+            'is_active' => 1
+        ]);
+
+        $account = Account::find(1);
+        $user = User::latest()->first();
+        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
+
+
+        return redirect()->back();
     }
 }

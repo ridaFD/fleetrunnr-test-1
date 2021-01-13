@@ -9,8 +9,13 @@ class Account extends Model
 {
     use HasFactory;
 
+    public function assign(User $user)
+    {
+        return $this->users()->save($user);
+    }
+
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('permissions', 'created_at');
+        return $this->belongsToMany(User::class)->withPivot('permissions');
     }
 }
