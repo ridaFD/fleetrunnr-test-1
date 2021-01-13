@@ -6,25 +6,19 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Crypt;
 
-class UserConfirmationNotification extends Notification
+class UserEmailVerified extends Notification
 {
     use Queueable;
-
-    /**
-     * @var string
-     */
-    public $user;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($user = null)
+    public function __construct()
     {
-        $this->user = $user;
+        //
     }
 
     /**
@@ -35,7 +29,7 @@ class UserConfirmationNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     /**
@@ -46,19 +40,11 @@ class UserConfirmationNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $phone = $this->user->phone;
-        $user_id = $this->user->id;
-        $email = $this->user->email;
-        $data = [$phone, $user_id, $email];
-
-        $token = Crypt::encryptString(implode(" ",$data));
-
         return (new MailMessage)
             ->from('fleetrunnr@gmail.com')
-            ->markdown('mail.users.user-confirmation', [
-                'name' => $this->user->name,
-                'token' => $token
-            ]);
+            ->subject('Email Verified')
+            ->line('Your account has been created.')
+            ->line('Thank you for using our application!');
     }
 
     /**

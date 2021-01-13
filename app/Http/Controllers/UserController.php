@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\User\Notifications\UserConfirmationNotification;
+use App\User\Notifications\UserEmailVerified;
 use App\User\Request\CreateUserRequest;
 use App\User\Resources\UserResource;
 use App\Models\User;
 use App\Models\Account;
+use http\Env\Response;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+use App\User\Resources\UserEmailConfirmationResource;
 
 class UserController extends Controller
 {
@@ -126,29 +129,61 @@ class UserController extends Controller
      * assign the user to the logged in account in the pivot table account_user with give him editor permission
      *
      */
-    public function store()
+    public function store(CreateUserRequest $request)
     {
-//        $request->validated();
-//
-//        User::create([
-//            'first_name' => request('first_name'),
-//            'last_name' => request('last_name'),
-//            'avatar' => request('avatar')->store('avatars'),
-//            'phone' => request('region') . ' ' . request('phone'),
-//            'email' => request('email'),
-//            'password' => Hash::make(request()['password']),
-//            'is_active' => 1
-//        ]);
+        $request->validated();
 
-//        $account = Account::find(1);
-//        $user = User::latest()->first();
-//        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
+        User::create([
+            'first_name' => request('first_name'),
+            'last_name' => request('last_name'),
+            'avatar' => request('avatar')->store('avatars'),
+            'phone' => request('region') . request('phone'),
+            'email' => request('email'),
+            'password' => Hash::make(request()['password']),
+            'is_active' => 1,
+        ]);
 
-        Mail::to('rami@gmail.com')
-            ->send(new UserConfirmationNotification());
+        /**
+         * assign the created user to the loged in account in the pivot table
+         */
+        $account = Account::find(1);
+        $user = User::latest()->first();
+        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
+
+        /**
+         * send email after create user
+         */
+        User::latest()->first()->notify(new UserConfirmationNotification($user));
 
         return redirect()
             ->back()
             ->with('message', 'email send');
+    }
+
+    public function confirm_email($token)
+    {
+        $decrypted_token = Crypt::decryptString($token);
+
+        /**
+         * convert the $decrypted_token into array.
+         */
+        $token_arr = explode(" ",$decrypted_token);
+
+        $user = User::latest()->first();
+
+        if ($user->phone == $token_arr[0] and $user->id == $token_arr[1] and $user->email == $token_arr[2]) {
+
+            // update the email_verified_at and set it to now()
+            $verified = User::find($user->id);
+            $verified->email_verified_at = now();
+            $verified->save();
+
+            //once the email is verified in the database notify the user that the newly account is created and verified
+            User::find($user->id)->notify(new UserEmailVerified());
+
+            return new UserEmailConfirmationResource(User::findOrFail($user->id));
+        } else {
+            return response('failure', 500);
+        }
     }
 }

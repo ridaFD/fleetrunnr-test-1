@@ -3,10 +3,10 @@
 
 Please confirm your account to continue
 
-@component('mail::button', ['url' => ''])
-Confirm
-@endcomponent
+<a href="{{ route('confirm_email', $token) }}" class="button" target="_blank" rel="noopener">
+    <button>Confirm</button>
+</a>
 
-Thanks,<br>
-{{ config('app.name') }}
+Thank you,<br>
+The {{ config('app.name') }} Team
 @endcomponent
