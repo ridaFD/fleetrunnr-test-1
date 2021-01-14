@@ -14,6 +14,7 @@ use http\Env\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use App\User\Resources\UserEmailConfirmationResource;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -121,22 +122,28 @@ class UserController extends Controller
     {
         $request->validated();
 
-        User::create([
-            'first_name' => request('first_name'),
-            'last_name' => request('last_name'),
-            'avatar' => request('avatar')->store('avatars'),
-            'phone' => request('region') . ' ' . request('phone'),
-            'email' => request('email'),
-            'password' => Hash::make(request()['password']),
-            'is_active' => 1,
-        ]);
-
         /**
-         * assign the created user to the loged in account in the pivot table
+         * Database Transactions
          */
-        $account = Account::find(1);
+        DB::transaction(function () {
+            User::create([
+                'first_name' => request('first_name'),
+                'last_name' => request('last_name'),
+                'avatar' => request('avatar')->store('avatars'),
+                'phone' => request('region') . ' ' . request('phone'),
+                'email' => request('email'),
+                'password' => Hash::make(request()['password']),
+                'is_active' => 1,
+            ]);
+
+            /**
+             * assign the created user to the loged in account in the pivot table
+             */
+            $account = Account::find(1);
+            $user = User::latest()->first();
+            $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
+        });
         $user = User::latest()->first();
-        $account->users()->attach($user->id, ['permissions' => json_encode([2 => "editor"])]);
 
         /**
          * send email after create user
