@@ -22,4 +22,7 @@ Route::get('/management/users/search', [UserController::class, 'search'])->name(
 Route::get('/management/users/create', [UserController::class, 'create'])->name('users.create');
 Route::post('/management/users/store', [UserController::class, 'store'])->name('users.store');
 Route::get('/management/users/confirm/{token}', [UserController::class, 'confirm_email'])->name('confirm_email');
+Route::get('/management/users/edit/{user}', [UserController::class, 'edit'])->name('users.edit');
+Route::patch('/management/users/update/{user}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/management/users/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 

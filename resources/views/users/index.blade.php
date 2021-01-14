@@ -58,7 +58,8 @@
                                 <span class="font-bold bg-yellow-500">Verified: </span>{{ $result->email_verified_at }}
                             </li>
                             <li>
-                                <span class="font-bold bg-yellow-500">Permissions: </span>{{ $result->pivot->permissions }}
+                                <span
+                                    class="font-bold bg-yellow-500">Permissions: </span>{{ $result->pivot->permissions }}
                             </li>
                         </ul>
                     @endforeach
@@ -97,8 +98,24 @@
                         <span class="font-bold bg-yellow-500">Permissions: </span>{{ $user->pivot->permissions }}
                     </li>
                 </ul>
+
+                <form action="{{ route('users.edit', $user->id) }}" method="get">
+                    @csrf
+                    <button type="submit"
+                            class="uppercase px-8 py-2 rounded-full bg-yellow-300 text-yellow-600 max-w-max shadow-sm hover:shadow-lg">
+                        Edit
+                    </button>
+                </form>
+                <form action="{{ route('users.destroy', $user->id) }}" method="post">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                            class="uppercase px-8 py-2 rounded-full bg-red-300 text-red-600 max-w-max shadow-sm hover:shadow-lg">
+                        Delete
+                    </button>
+                </form>
             @endforeach
-                {{ $users->links() }}
+            {{ $users->links() }}
         </div>
     </div>
 </x-layout>

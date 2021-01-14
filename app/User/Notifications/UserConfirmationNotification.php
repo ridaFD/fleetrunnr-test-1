@@ -49,9 +49,9 @@ class UserConfirmationNotification extends Notification
         $phone = $this->user->phone;
         $user_id = $this->user->id;
         $email = $this->user->email;
-        $data = [$phone, $user_id, $email];
+        $data = $phone. ',' . $user_id . ',' . $email;
 
-        $token = Crypt::encryptString(implode(" ",$data));
+        $token = Crypt::encryptString($data);
 
         return (new MailMessage)
             ->from('fleetrunnr@gmail.com')
